@@ -1,0 +1,12 @@
+﻿<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>System.Management.Automation.PSCustomObject</T>
+      <T>System.Object</T>
+    </TN>
+    <MS>
+      <S N="ClientId">2e26e15f6b50d51ca051</S>
+      <S N="Secret">c134855a7de140812ecfbb4956f7f09a11690d15fcf7d27b85194fb3dbe3</S>
+    </MS>
+  </Obj>
+</Objs>
