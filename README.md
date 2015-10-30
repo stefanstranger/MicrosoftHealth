@@ -5,7 +5,7 @@ PowerShell Module for Microsoft Health Cloud API
 10/30/2015: - Updated README.md file
 
 # Install
-1. Download the MicrosoftHealth-masterzip file.
+1. Download the MicrosoftHealth-master.zip file.
 2. Unblock the zip file (right click and select unblock).
 3. Extract zip contents MicrosoftHealth-master.zip file.
 4. Rename MicrosoftHealth-master folder to MicrosoftHealth.
