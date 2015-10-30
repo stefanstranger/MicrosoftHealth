@@ -2,12 +2,15 @@
 PowerShell Module for Microsoft Health Cloud API
 
 10/29/2015: - Initial version
+10/30/2015: - Updated README.md file
 
 # Install
-1. Download the zip file.
-2. Unblock the zip file.
-3. Extract contents to PowerShell Module folder of your choice.
-4. Run import-module MicrosoftHealth cmdlet in PowerShell after following below steps.
+1. Download the MicrosoftHealth-masterzip file.
+2. Unblock the zip file (right click and select unblock).
+3. Extract zip contents MicrosoftHealth-master.zip file.
+4. Rename MicrosoftHealth-master folder to MicrosoftHealth.
+5. Copy renamed MicrosoftHealth folder with contents to C:\Users\[username]\Documents\WindowsPowerShell\Modules folder
+6. Run import-module MicrosoftHealth cmdlet in PowerShell after following below steps.
 
 # Microsoft Health Register your app
 In order to connect to the Microsoft Health Cloud APIs, you will need a Microsoft Account with a registered application. 
@@ -30,3 +33,40 @@ This will provide the client id and client secret that can be used within your a
 9. Enter your personal MicrosoftHealth client id and secret in the Authentication.config.xml_example file.
 10. Save Authentication.config.xml_example file as Authentication.config.xml in MicrosoftHealth Module folder.
 
+#Usage
+After importing the MicrosoftHealth Module run Get-Command -Module MicrosoftHealth for the available commands in the module.
+
+PS C:\windows\system32> get-command -module Microsofthealth
+
+CommandType     Name                                               Version    Source                                                                   
+-----------     ----                                               -------    ------                                                                   
+Function        Get-MicrosoftHealthActivity                        1.0        microsofthealth                                                          
+Function        Get-MicrosoftHealthDevice                          1.0        microsofthealth                                                          
+Function        Get-MicrosoftHealthProfile                         1.0        microsofthealth                                                          
+Function        Get-MicrosoftHealthSummary                         1.0        microsofthealth                                                          
+Function        Get-oAuth2AccessToken                              1.0        microsofthealth
+
+Use Get-Help command to explore the command.
+PS C:\windows\system32> Get-Help Get-MicrosoftHealthProfile
+
+NAME
+    Get-MicrosoftHealthProfile
+    
+SYNOPSIS
+    Gets the UserProfile.
+    
+    
+SYNTAX
+    Get-MicrosoftHealthProfile [<CommonParameters>]
+    
+    
+DESCRIPTION
+    The UserProfile object contains the general profile of the person using Microsoft Band.
+    
+
+RELATED LINKS
+
+REMARKS
+    To see the examples, type: "get-help Get-MicrosoftHealthProfile -examples".
+    For more information, type: "get-help Get-MicrosoftHealthProfile -detailed".
+    For technical information, type: "get-help Get-MicrosoftHealthProfile -full".
