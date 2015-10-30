@@ -35,7 +35,7 @@ This will provide the client id and client secret that can be used within your a
 
 #Usage
 After importing the MicrosoftHealth Module run Get-Command -Module MicrosoftHealth for the available commands in the module.
-
+```PowerShell
 PS C:\windows\system32> get-command -module Microsofthealth
 
 CommandType     Name                                               Version    Source                                                                   
@@ -45,8 +45,10 @@ Function        Get-MicrosoftHealthDevice                          1.0        mi
 Function        Get-MicrosoftHealthProfile                         1.0        microsofthealth                                                          
 Function        Get-MicrosoftHealthSummary                         1.0        microsofthealth                                                          
 Function        Get-oAuth2AccessToken                              1.0        microsofthealth
+```
 
 Use Get-Help command to explore the command.
+```PowerShell
 PS C:\windows\system32> Get-Help Get-MicrosoftHealthProfile
 
 NAME
@@ -70,3 +72,4 @@ REMARKS
     To see the examples, type: "get-help Get-MicrosoftHealthProfile -examples".
     For more information, type: "get-help Get-MicrosoftHealthProfile -detailed".
     For technical information, type: "get-help Get-MicrosoftHealthProfile -full".
+```
