@@ -31,6 +31,7 @@ Remove-Variable -Name AccessToken, ValidThru -ErrorAction SilentlyContinue
 # To start the sign-in process within your application or web service, you need to
 # use a web browser or web browser control to load a URL request for the Access Token
 #####################################################################################
+# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
 function Get-oAuth2AccessToken 
 {
     [CmdletBinding()]
@@ -138,6 +139,7 @@ function Get-MicrosoftHealthData
 Function Get-MicrosoftHealthProfile 
 {
     <#
+			.EXTERNALHELP MicrosoftHealth.psm1-help.xml
             .Synopsis
             Gets the UserProfile.
             .DESCRIPTION
@@ -175,6 +177,7 @@ Function Get-MicrosoftHealthProfile
 Function Get-MicrosoftHealthDevice 
 {
     <#
+			# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
             .Synopsis
             Gets Microsoft Band Device information
             .DESCRIPTION
@@ -204,6 +207,7 @@ Function Get-MicrosoftHealthDevice
 Function Get-MicrosoftHealthActivity 
 {
 <#
+.EXTERNALHELP MicrosoftHealth.psm1-help.xml
 .Synopsis
    Gets Microsoft Band Activity
 .DESCRIPTION
@@ -307,9 +311,11 @@ Function Get-MicrosoftHealthActivity
     }
 }
 
+
 Function Get-MicrosoftHealthSummary 
 {
 <#
+.EXTERNALHELP MicrosoftHealth.psm1-help.xml
 .Synopsis
    Gets summarized data
 .DESCRIPTION
