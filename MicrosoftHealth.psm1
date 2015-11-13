@@ -135,26 +135,9 @@ function Get-MicrosoftHealthData
     return $result
 }
 
+# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
 Function Get-MicrosoftHealthProfile 
 {
-    <#
-            .Synopsis
-            Gets the UserProfile.
-            .DESCRIPTION
-            The UserProfile object contains the general profile of the person using Microsoft Band. 
-            .EXAMPLE
-            Get-MicrosoftHealthProfile
-
-            firstName      : John
-            middleName     : null
-            lastName       : Doe
-            birthdate      : 1970-01-01T00:00:00.000+00:00
-            postalCode     : 
-            gender         : Male
-            height         : 1680
-            weight         : 72000
-            lastUpdateTime : 2015-10-28T19:43:27.123+00:00
-    #>
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
     param()
@@ -172,16 +155,9 @@ Function Get-MicrosoftHealthProfile
     }
 }
 
+# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
 Function Get-MicrosoftHealthDevice 
 {
-    <#
-            .Synopsis
-            Gets Microsoft Band Device information
-            .DESCRIPTION
-            The Device object represents a device that collects and sends user data to the Microsoft Health service
-            .EXAMPLE
-            Get-MicrosoftHealthDevice
-    #>
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
     param()
@@ -201,31 +177,9 @@ Function Get-MicrosoftHealthDevice
     }
 }
 
+# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
 Function Get-MicrosoftHealthActivity 
 {
-<#
-.Synopsis
-   Gets Microsoft Band Activity
-.DESCRIPTION
-   The Activity object represents activities a user has completed using the tiles on the Microsoft Band.
-   The following activities can be retrieved:
-   - Run
-   - Bike
-   - Free Play (Workout)
-   - Guided Workout
-   - Golf
-   - Sleep 
-.EXAMPLE
-   Get-MicrosoftHealthActivity -Activity Run
-.EXAMPLE
-   Get-MicrosoftHealthActivity -Activity Bike
-.EXAMPLE
-   Get-MicrosoftHealthActivity -activity Run -Details -MapPoints -MinuteSummaries
-.EXAMPLE
-   Get-MicrosoftHealthActivity -activity Run -Details -StartTime 10-01-2015 -EndTime 10-28-2015
-   Returns all Run Activities with Detailed information between dates 10-01-2015 and 10-28-2015
-   
-#>
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
     param(
@@ -307,28 +261,9 @@ Function Get-MicrosoftHealthActivity
     }
 }
 
+# .EXTERNALHELP MicrosoftHealth.psm1-help.xml
 Function Get-MicrosoftHealthSummary 
 {
-<#
-.Synopsis
-   Gets summarized data
-.DESCRIPTION
-    Provides a sum-up of user data on an hourly or daily basis. 
-    This data is divided into several sub-groups: 
-    - Steps The total number of steps taken in the time period 
-    - Calories Burned The total calories burned in the time period 
-    - Heart Rate The average, peak, and lowest heart rate in the time period 
-    - Distance 
-.EXAMPLE
-   Get-MicrosoftHealthSummary -Period Daily
-   Gets a summary of Daily data on a Daily basis
-.EXAMPLE
-   Get-MicrosoftHealthSummary -Period Hourly
-   Gets a summary of Daily data on a Hourly basis
-.EXAMPLE
-   Get-MicrosoftHealthSummary -Period Hourly -StartTime 10-01-2015 -EndTime 10-10-2015 -maxPageSize 1
-   Gets a summary overview of the Hourly data from 1st of October 2015 till 10th of October 2015 with page size of 1 
-#>
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
     param(
