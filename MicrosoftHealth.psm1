@@ -140,6 +140,7 @@ Function Get-MicrosoftHealthProfile
 {
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
+    [Alias('ghp')]
     param()
 
     process {
@@ -160,6 +161,7 @@ Function Get-MicrosoftHealthDevice
 {
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
+    [Alias('ghd')]
     param()
 
     process {   
@@ -182,6 +184,7 @@ Function Get-MicrosoftHealthActivity
 {
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
+    [Alias('gha')]
     param(
         [ValidateSet("Run", "Bike", "Freeplay","GuidedWorkout","Golf","Sleep")]
         [Parameter(Mandatory = $true)]
@@ -266,6 +269,7 @@ Function Get-MicrosoftHealthSummary
 {
     [CmdletBinding()]
     [OutputType('System.Management.Automation.PSCustomObject')]
+    [Alias('ghs')]
     param(
         
         [ValidateSet('Daily', 'Hourly')]
@@ -305,7 +309,7 @@ Function Get-MicrosoftHealthSummary
             {
                 #Check if MaxPageSize is first param.
                 write-verbose $HttpRequestUrl
-                if (!($HttpRequestUrl -match '$?')) #if httprequesturl does not end on ? use & sign
+                if (!($HttpRequestUrl -match '\?$')) #if httprequesturl does not end on ? use & sign
                 {
                     $HttpRequestUrl = $HttpRequestUrl + "&maxPageSize=$($_.maxPageSize)"
                 }
