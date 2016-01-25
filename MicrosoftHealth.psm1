@@ -58,14 +58,15 @@ function Get-oAuth2AccessToken
     
     $web = New-Object -TypeName System.Windows.Forms.WebBrowser -Property @{
         Width  = 400
-        Height = 500
+        Height = 750
     }
 
     $web.Add_DocumentCompleted($OnDocumentCompleted)
 
     $form = New-Object -TypeName System.Windows.Forms.Form -Property @{
         Width  = 400
-        Height = 500
+        Height = 750
+        Autoscroll = $true
     }
 
     $form.Add_Shown({
