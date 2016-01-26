@@ -3,6 +3,11 @@ PowerShell Module for Microsoft Health Cloud API
 
 - 10/29/2015: Initial version
 - 10/30/2015: Updated README.md file
+- 11/13/2015: Separated Help from Code
+- 11/13/2015: Changed Licence Type
+- 01/25/2016: Changed size Authentication Browser Control
+- 01/26/2016: Changed Authentication to one time authentication.
+
 
 # Install
 1. Download the MicrosoftHealth-master.zip file.
