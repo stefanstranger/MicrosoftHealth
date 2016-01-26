@@ -1,5 +1,6 @@
 ﻿#requires -Version 3
 $script:AuthenticationSettingsPath = "$PSScriptRoot\Authentication.config.xml"
+$script:AuthenticationTokenSettingsPath = "$PSScriptRoot\AuthenticationToken.config.xml"
 
 #clear AccessToken,ValidThru variables when loading module
 Remove-Variable -Name AccessToken, ValidThru -ErrorAction SilentlyContinue
@@ -64,8 +65,8 @@ function Get-oAuth2AccessToken
     $web.Add_DocumentCompleted($OnDocumentCompleted)
 
     $form = New-Object -TypeName System.Windows.Forms.Form -Property @{
-        Width  = 400
-        Height = 750
+        Width      = 400
+        Height     = 750
         Autoscroll = $true
     }
 
@@ -77,7 +78,8 @@ function Get-oAuth2AccessToken
 
 
     # Request Authorization Code
-    $Scope = @('mshealth.ReadProfile', 'mshealth.ReadActivityHistory', 'mshealth.ReadDevices', 'mshealth.ReadActivityLocation')  
+    #$Scope = @('mshealth.ReadProfile', 'mshealth.ReadActivityHistory', 'mshealth.ReadDevices', 'mshealth.ReadActivityLocation')  
+    $Scope = @('mshealth.ReadProfile', 'mshealth.ReadActivityHistory', 'mshealth.ReadDevices', 'mshealth.ReadActivityLocation', 'offline_access')  
     $web.Navigate("$AuthorizeUri`?client_id=$ClientId&scope=$Scope&response_type=code&redirect_uri=$RedirectUri")
     $null = $form.ShowDialog()
 
@@ -87,9 +89,40 @@ function Get-oAuth2AccessToken
     -Body "client_id=$ClientId&redirect_uri=$RedirectUri&client_secret=$Secret&code=$AuthCode&grant_type=authorization_code"
     $global:AccessToken = $Response.access_token
     $global:ValidThru = (Get-Date).AddSeconds([int]$Response.expires_in)
-    $RefreshToken = $Response.refresh_token
+    $global:RefreshToken = $Response.refresh_token
     Write-Debug -Message ('Access token is: {0}' -f $AccessToken)
     #endregion
+
+    # Write AccessCode and RefreshToken to file for future usage
+    #@($($accesstoken | select @{L='AccessToken';E={$_}}),$($refreshtoken | select @{L='Refreshtoken';E={$_}})) | export-clixml -Path $AuthenticationTokenSettingsPath 
+    Set-AuthenticationToken -AccessToken $AccessToken -RefreshToken $RefreshToken
+    Write-Debug -Message ('Refresh token is: {0}' -f $RefreshToken)
+}
+
+#####################################################################################
+# Helper function for MicrosoftHealth Module
+# Description: 
+# When acurrent access_token has expired, if it expires, 
+# run the following request to redeem the refresh token for a new access token
+#####################################################################################
+function Get-oAuth2RefreshToken
+{
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)] [string] $ClientId,
+        [Parameter(Mandatory = $true)] [string] $Secret,
+        [Parameter(Mandatory = $false)] [string] $RedirectUri = 'https://login.live.com/oauth20_desktop.srf'
+    )
+
+    $settings = Load-AuthenticationSettings
+    $RefreshToken = $settings.RefreshToken
+    $Response = Invoke-RestMethod -Uri 'https://login.live.com/oauth20_token.srf' -Method Post `
+    -ContentType 'application/x-www-form-urlencoded' `
+    -Body "client_id=$ClientId&redirect_uri=$RedirectUri&client_secret=$Secret&refresh_token=$RefreshToken&grant_type=refresh_token"
+    $global:AccessToken = $Response.access_token
+    $global:ValidThru = (Get-Date).AddSeconds([int]$Response.expires_in)
+    $global:RefreshToken = $Response.refresh_token
+    Write-Debug -Message ('Access token is: {0}' -f $AccessToken)
 }
 
 
@@ -119,15 +152,16 @@ function Get-MicrosoftHealthData
     )
 
     $settings = Load-AuthenticationSettings
-    #Check for AccessToken variable
-    if (!($AccessToken))
+    #Check for AccessToken variable and if there is no refreshtoken stored in settings file
+    if (!($AccessToken) -and (!($settings.RefreshToken)))
     {
         Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
     }
     elseif ($ValidThru -lt (Get-Date)) 
     {
-        'AccessToken has expired'
-        Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
+        Write-Verbose 'AccessToken has expired'
+        #Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
+        Get-oAuth2RefreshToken -ClientId $settings.ClientId -Secret $settings.Secret
     }
 
     $headers = Build-AccessHeader -AccessToken $AccessToken
@@ -187,7 +221,7 @@ Function Get-MicrosoftHealthActivity
     [OutputType('System.Management.Automation.PSCustomObject')]
     [Alias('gha')]
     param(
-        [ValidateSet("Run", "Bike", "Freeplay","GuidedWorkout","Golf","Sleep")]
+        [ValidateSet('Run', 'Bike', 'Freeplay','GuidedWorkout','Golf','Sleep')]
         [Parameter(Mandatory = $true)]
         [string]$activity,
         [Parameter(Mandatory = $false)]
@@ -201,16 +235,25 @@ Function Get-MicrosoftHealthActivity
         [Parameter(Mandatory = $false)]
         [Switch]$MapPoints,
         [Parameter(Mandatory = $false)]
-        [Switch]$MinuteSummaries)
+    [Switch]$MinuteSummaries)
 
 
     process {
         #Get-MicrosoftHealthData -RequestUrl 'https://api.microsofthealth.net/v1/me/Activities?activityTypes=run&activityIncludes=Details,MapPoints,MinuteSummaries'
         $params = [pscustomobject]([ordered]@{}+$PSBoundParameters)
         #Check if Details, MapPoint or MinuteSummeries params are being used. 
-        if ($params.Details) {$HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"}
-        elseif ($params.MapPoints) {$HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"}
-        elseif ($params.MinuteSummaries) {$HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"}
+        if ($params.Details) 
+        {
+            $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"
+        }
+        elseif ($params.MapPoints) 
+        {
+            $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"
+        }
+        elseif ($params.MinuteSummaries) 
+        {
+            $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity&activityIncludes"
+        }
         else
         {
             $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Activities?activityTypes=$activity"
@@ -261,7 +304,7 @@ Function Get-MicrosoftHealthActivity
             }
         }
         $result = Get-MicrosoftHealthData -RequestUrl $HttpRequestUrl
-        $result.($($Activity+"Activities"))
+        $result.($($activity+'Activities'))
     }
 }
 
@@ -289,7 +332,7 @@ Function Get-MicrosoftHealthSummary
 
     process {
         $params = [pscustomobject]([ordered]@{}+$PSBoundParameters)
-        $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Summaries/$Period"+"?"
+        $HttpRequestUrl = "https://api.microsofthealth.net/v1/me/Summaries/$Period"+'?'
         switch ($params)
         {
             {
@@ -309,7 +352,7 @@ Function Get-MicrosoftHealthSummary
             } 
             {
                 #Check if MaxPageSize is first param.
-                write-verbose $HttpRequestUrl
+                Write-Verbose $HttpRequestUrl
                 if (!($HttpRequestUrl -match '\?$')) #if httprequesturl does not end on ? use & sign
                 {
                     $HttpRequestUrl = $HttpRequestUrl + "&maxPageSize=$($_.maxPageSize)"
@@ -341,6 +384,36 @@ function Get-AuthenticationSettingsPath
     $script:AuthenticationSettingsPath
 }
 
+function Load-AuthenticationSettings 
+{
+    $path = Get-AuthenticationSettingsPath
+    Import-Clixml -Path $path
+}
+
+
+function Set-AuthenticationToken
+{
+    param (
+        $AccessToken,
+        $RefreshToken
+    )
+    
+    $settings = Load-AuthenticationSettings
+
+    $AuthObject = New-Object -TypeName psObject -Property @{
+        ClientId     = $settings.ClientId
+        Secret       = $settings.Secret
+        AccessToken  = $AccessToken
+        RefreshToken = $RefreshToken
+    }
+
+    #Store AccessToken and RefreshToken in configuration file.
+    $path = Get-AuthenticationSettingsPath
+    Export-Clixml -Path $path -InputObject $AuthObject
+}
+#endregion
+
+#region Unused Functions
 function New-AuthenticationSettings
 {
     param (
@@ -362,11 +435,5 @@ function Save-AuthenticationSettings
 
     $path = Get-AuthenticationSettingsPath
     Export-Clixml -Path $path -InputObject $AuthenticationSettings
-}
-
-function Load-AuthenticationSettings 
-{
-    $path = Get-AuthenticationSettingsPath
-    Import-Clixml -Path $path
 }
 #endregion
