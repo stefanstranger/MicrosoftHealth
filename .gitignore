@@ -1,4 +1,6 @@
 MicrosoftHealth.ps1
-MicrosoftHealth.zip
 MSBand.ps1
 Authentication.config.xml
+FindCitieForRuns.ps1
+MicrosoftHealthExportExcel_Example.ps1
+Wei.ps1
