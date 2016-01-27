@@ -1,6 +1,5 @@
 ﻿#requires -Version 3
 $script:AuthenticationSettingsPath = "$PSScriptRoot\Authentication.config.xml"
-$script:AuthenticationTokenSettingsPath = "$PSScriptRoot\AuthenticationToken.config.xml"
 
 #clear AccessToken,ValidThru variables when loading module
 Remove-Variable -Name AccessToken, ValidThru -ErrorAction SilentlyContinue
@@ -78,7 +77,6 @@ function Get-oAuth2AccessToken
 
 
     # Request Authorization Code
-    #$Scope = @('mshealth.ReadProfile', 'mshealth.ReadActivityHistory', 'mshealth.ReadDevices', 'mshealth.ReadActivityLocation')  
     $Scope = @('mshealth.ReadProfile', 'mshealth.ReadActivityHistory', 'mshealth.ReadDevices', 'mshealth.ReadActivityLocation', 'offline_access')  
     $web.Navigate("$AuthorizeUri`?client_id=$ClientId&scope=$Scope&response_type=code&redirect_uri=$RedirectUri")
     $null = $form.ShowDialog()
@@ -94,7 +92,6 @@ function Get-oAuth2AccessToken
     #endregion
 
     # Write AccessCode and RefreshToken to file for future usage
-    #@($($accesstoken | select @{L='AccessToken';E={$_}}),$($refreshtoken | select @{L='Refreshtoken';E={$_}})) | export-clixml -Path $AuthenticationTokenSettingsPath 
     Set-AuthenticationToken -AccessToken $AccessToken -RefreshToken $RefreshToken
     Write-Debug -Message ('Refresh token is: {0}' -f $RefreshToken)
 }
@@ -174,7 +171,7 @@ function Get-MicrosoftHealthData
 Function Get-MicrosoftHealthProfile 
 {
     [CmdletBinding()]
-    [OutputType('System.Management.Automation.PSCustomObject')]
+    [OutputType('System.String')]
     [Alias('ghp')]
     param()
 
@@ -195,7 +192,7 @@ Function Get-MicrosoftHealthProfile
 Function Get-MicrosoftHealthDevice 
 {
     [CmdletBinding()]
-    [OutputType('System.Management.Automation.PSCustomObject')]
+    [OutputType('System.String')]
     [Alias('ghd')]
     param()
 
@@ -239,8 +236,7 @@ Function Get-MicrosoftHealthActivity
 
 
     process {
-        #Get-MicrosoftHealthData -RequestUrl 'https://api.microsofthealth.net/v1/me/Activities?activityTypes=run&activityIncludes=Details,MapPoints,MinuteSummaries'
-        $params = [pscustomobject]([ordered]@{}+$PSBoundParameters)
+         $params = [pscustomobject]([ordered]@{}+$PSBoundParameters)
         #Check if Details, MapPoint or MinuteSummeries params are being used. 
         if ($params.Details) 
         {
@@ -304,7 +300,7 @@ Function Get-MicrosoftHealthActivity
             }
         }
         $result = Get-MicrosoftHealthData -RequestUrl $HttpRequestUrl
-        $result.($($activity+'Activities'))
+        $result.(-join ($activity,'activities')) #PSAvoidInvokingEmptyMembers '($($activity+'Activities'))' has non-constant members scriptanalyzer rule fixed
     }
 }
 
@@ -413,6 +409,7 @@ function Set-AuthenticationToken
 }
 #endregion
 
+<#
 #region Unused Functions
 function New-AuthenticationSettings
 {
@@ -437,3 +434,4 @@ function Save-AuthenticationSettings
     Export-Clixml -Path $path -InputObject $AuthenticationSettings
 }
 #endregion
+#>
