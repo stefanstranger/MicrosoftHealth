@@ -2,7 +2,7 @@
 $script:AuthenticationSettingsPath = "$PSScriptRoot\Authentication.config.xml"
 
 #clear AccessToken,ValidThru variables when loading module
-Remove-Variable -Name AccessToken, ValidThru -ErrorAction SilentlyContinue
+Remove-Variable -Name AccessToken, RefreshToken, ValidThru -ErrorAction SilentlyContinue
 
 <#	
         ===========================================================================
@@ -148,23 +148,30 @@ function Get-MicrosoftHealthData
         $RequestUrl
     )
 
-    $settings = Load-AuthenticationSettings
-    #Check for AccessToken variable and if there is no refreshtoken stored in settings file
-    if (!($AccessToken) -and (!($settings.RefreshToken)))
+    try 
     {
-        Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
-    }
-    elseif ($ValidThru -lt (Get-Date)) 
-    {
-        Write-Verbose 'AccessToken has expired'
-        #Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
-        Get-oAuth2RefreshToken -ClientId $settings.ClientId -Secret $settings.Secret
-    }
+        $settings = Load-AuthenticationSettings
+        #Check for AccessToken variable and if there is no refreshtoken stored in settings file
+        if (!($AccessToken) -and (!($settings.RefreshToken)))
+        {
+            Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
+        }
+        elseif ($ValidThru -lt (Get-Date)) 
+        {
+            Write-Verbose 'AccessToken has expired'
+            #Get-oAuth2AccessToken -ClientId $settings.ClientId -Secret $settings.Secret
+            Get-oAuth2RefreshToken -ClientId $settings.ClientId -Secret $settings.Secret
+        }
 
-    $headers = Build-AccessHeader -AccessToken $AccessToken
-    Write-Verbose $RequestUrl
-    $result = Invoke-RestMethod -Uri $RequestUrl -Method GET -Headers $headers -ContentType 'application/json'
-    return $result
+        $headers = Build-AccessHeader -AccessToken $AccessToken
+        Write-Verbose $RequestUrl
+        $result = Invoke-RestMethod -Uri $RequestUrl -Method GET -Headers $headers -ContentType 'application/json'
+        return $result
+    }
+    catch
+    {
+        'Could not retrieve MicrosoftHealth Data'
+    }
 }
 
 # .EXTERNALHELP MicrosoftHealth.psm1-help.xml
@@ -185,6 +192,10 @@ Function Get-MicrosoftHealthProfile
             'The remote server returned an error: (400) Bad Request.'
             'Authenticate first. Run Get-oAuth2AccessToken function'            
         }
+        catch
+        {
+            'Something went wrong'           
+        }  
     }
 }
 
@@ -206,7 +217,11 @@ Function Get-MicrosoftHealthDevice
         {
             'The remote server returned an error: (400) Bad Request.'
             'Authenticate first. Run Get-oAuth2AccessToken function'            
-        }     
+        }
+        catch
+        {
+            'Something went wrong'           
+        }    
 
     }
 }
@@ -382,8 +397,16 @@ function Get-AuthenticationSettingsPath
 
 function Load-AuthenticationSettings 
 {
-    $path = Get-AuthenticationSettingsPath
-    Import-Clixml -Path $path
+    try
+    {
+        $path = Get-AuthenticationSettingsPath
+        Import-Clixml -Path $path
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        "Follow step 8 of README.md file"
+        notepad "$PSScriptRoot\README.md"
+    }
 }
 
 
