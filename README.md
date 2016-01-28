@@ -7,9 +7,16 @@ PowerShell Module for Microsoft Health Cloud API
 - 11/13/2015: Changed Licence Type
 - 01/25/2016: Changed size Authentication Browser Control
 - 01/26/2016: Changed Authentication to one time authentication.
+- 01/28.2016: Added warning message during Module loading.
 
+# Install from PowerShell Gallery
+```PowerShell
+PS> Save-Module -Name MicrosoftHealth -Path <path> #Inspect Module
 
-# Install
+PS> Install-Module -Name MicrosoftHealth -Scope CurrentUser #Install Module
+```
+
+# Install from Github
 1. Download the MicrosoftHealth-master.zip file.
 2. Unblock the zip file (right click and select unblock).
 3. Extract zip contents MicrosoftHealth-master.zip file.
@@ -45,11 +52,10 @@ PS C:\windows\system32> get-command -module Microsofthealth
 
 CommandType     Name                                               Version    Source                                                                   
 -----------     ----                                               -------    ------                                                                   
-Function        Get-MicrosoftHealthActivity                        1.0        microsofthealth                                                          
-Function        Get-MicrosoftHealthDevice                          1.0        microsofthealth                                                          
-Function        Get-MicrosoftHealthProfile                         1.0        microsofthealth                                                          
-Function        Get-MicrosoftHealthSummary                         1.0        microsofthealth                                                          
-Function        Get-oAuth2AccessToken                              1.0        microsofthealth
+Function        Get-MicrosoftHealthActivity                        1.5        microsofthealth                                                          
+Function        Get-MicrosoftHealthDevice                          1.5        microsofthealth                                                          
+Function        Get-MicrosoftHealthProfile                         1.5        microsofthealth                                                          
+Function        Get-MicrosoftHealthSummary                         1.5        microsofthealth                                                          
 ```
 
 Use Get-Help command to explore the command.
