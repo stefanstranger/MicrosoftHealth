@@ -1,6 +1,8 @@
 ﻿#requires -Version 3
 $script:AuthenticationSettingsPath = "$PSScriptRoot\Authentication.config.xml"
 
+Write-Warning "Please be aware your AccessToken and RefreshToken will be stored in the module folder`n`t`t Other users could be able to use this data to connect to your MicrosoftHealth data."
+
 #clear AccessToken,ValidThru variables when loading module
 Remove-Variable -Name AccessToken, RefreshToken, ValidThru -ErrorAction SilentlyContinue
 
